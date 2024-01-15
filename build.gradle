@@ -9,6 +9,10 @@ plugins {
 	id 'com.github.jmongard.git-semver-plugin' version '0.11.0'
 }
 
+semver {
+	noDirtyCheck = true
+}
+
 group = 'it.magiavventure'
 version = semver.version
 
