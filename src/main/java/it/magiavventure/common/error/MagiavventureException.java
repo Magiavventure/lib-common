@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class MagiavventureException extends RuntimeException {
 
-    public static final String UNKNOWN_ERROR = "unknown-error";
+    public static final String UNKNOWN_ERROR = "unknown-error ";
 
     private final transient Error error;
 
