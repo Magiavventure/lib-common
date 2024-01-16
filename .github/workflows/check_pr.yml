@@ -1,11 +1,11 @@
 name: Gradle build and test (+ coverage)
 
 on:
-  push:
+  pull_request:
     branches: [ "main" ]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -38,21 +38,3 @@ jobs:
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Retrieve current version number before release
-        run: ./gradlew printVersion
-
-      - name: Release Version
-        run: ./gradlew releaseVersion --no-commit
-
-      - name: Push new tag
-        run: |
-          git push origin --tags
-
-      - name: Create GitHub release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          tag=$(git describe --tags --abbrev=0)
-          version=$(git describe --tags --abbrev=0)
-           ./gradlew -q printChangeLog | gh release create $tag -d -t "Release $version" -F - --target main
