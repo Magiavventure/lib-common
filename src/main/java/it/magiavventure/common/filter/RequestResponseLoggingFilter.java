@@ -51,7 +51,7 @@ public class RequestResponseLoggingFilter extends GenericFilterBean {
                 .append("\", ")
                 .append(headersToString(Collections.list(request.getHeaderNames()), request::getHeader))
                 .append("\"body\": ")
-                .append(Objects.nonNull(body) && !body.isEmpty() ? body : "{}")
+                .append(!body.isEmpty() ? body : "{}")
                 .append("}");
         log.info("REQUEST -> {}", builder);
     }
@@ -95,7 +95,7 @@ public class RequestResponseLoggingFilter extends GenericFilterBean {
         }
     }
 
-    private static class BodyCachingRequestWrapper extends HttpServletRequestWrapper {
+    static class BodyCachingRequestWrapper extends HttpServletRequestWrapper {
         private final String body;
 
         BodyCachingRequestWrapper(HttpServletRequest request, String body) {
@@ -109,7 +109,7 @@ public class RequestResponseLoggingFilter extends GenericFilterBean {
             return new CachedBodyServletInputStream(bytes);
         }
     }
-    private static class CachedBodyServletInputStream extends ServletInputStream {
+    static class CachedBodyServletInputStream extends ServletInputStream {
         private final ByteArrayInputStream inputStream;
 
         CachedBodyServletInputStream(byte[] body) {
@@ -133,8 +133,9 @@ public class RequestResponseLoggingFilter extends GenericFilterBean {
 
         @Override
         public void setReadListener(ReadListener readListener) {
-            // empty
+            //empty
         }
+
     }
 
 
