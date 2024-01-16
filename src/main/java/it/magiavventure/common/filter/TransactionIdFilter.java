@@ -30,7 +30,7 @@ public class TransactionIdFilter extends GenericFilterBean {
 
         String transactionId = UUID.randomUUID().toString();
         String transactionIdHeader = request.getHeader(TRANSACTION_ID);
-        if (Objects.nonNull(transactionIdHeader) && transactionIdHeader.isEmpty()) {
+        if (Objects.nonNull(transactionIdHeader) && !transactionIdHeader.isEmpty()) {
             transactionId = transactionIdHeader;
         }
         MDC.put(TRANSACTION_ID, transactionId);
