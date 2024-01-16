@@ -21,7 +21,7 @@ public class DefaultExceptionHandler {
     private final HttpErrorMapper httpErrorMapper;
 
     @ExceptionHandler({MagiavventureException.class})
-    public ResponseEntity<HttpError> userExceptionHandler(MagiavventureException magiavventureException) {
+    public ResponseEntity<HttpError> exceptionHandler(MagiavventureException magiavventureException) {
 
         Error error = magiavventureException.getError();
         ErrorMessage errorMessage = retrieveError(error.getKey());
