@@ -2,7 +2,7 @@ package it.magiavventure.common.error;
 
 import it.magiavventure.common.configuration.CommonProperties;
 import it.magiavventure.common.configuration.CommonProperties.ErrorsProperties;
-import it.magiavventure.common.configuration.CommonProperties.ErrorsProperties.ErrorMessage;;
+import it.magiavventure.common.configuration.CommonProperties.ErrorsProperties.ErrorMessage;
 import it.magiavventure.common.error.handler.DefaultExceptionHandler;
 import it.magiavventure.common.mapper.HttpErrorMapper;
 import it.magiavventure.common.model.HttpError;
@@ -38,14 +38,14 @@ class DefaultExceptionHandlerTest {
             "user-not-found, user-not-found, user non trovato, desc user non trovato, 404, prova",
             "user-exists, user-exists, il nome 'prova' non è disponibile, desc nome già esistente, 403, prova",
             "error-not-exists, unknown-error, errore sconosciuto, desc sconosciuta, 500, prova"})
-    @DisplayName("Handle user exception and return ResponseEntity")
-    void handleUserExceptionTest(String code, String expectedCode, String expectedMessage,
+    @DisplayName("Handle exception and return ResponseEntity")
+    void handleExceptionTest(String code, String expectedCode, String expectedMessage,
                                  String expectedDescription, int expectedStatus,
                                  String args) {
 
         var magiavventureException = MagiavventureException.of(code, args);
 
-        ResponseEntity<HttpError> responseEntity = defaultExceptionHandler.userExceptionHandler(magiavventureException);
+        ResponseEntity<HttpError> responseEntity = defaultExceptionHandler.exceptionHandler(magiavventureException);
 
         Assertions.assertNotNull(responseEntity);
         Assertions.assertNotNull(responseEntity.getBody());
@@ -61,13 +61,13 @@ class DefaultExceptionHandlerTest {
             "user-not-found, user-not-found, user non trovato, desc user non trovato, 404",
             "user-exists, user-exists, il nome '%s' non è disponibile, desc nome già esistente, 403",
             "error-not-exists, unknown-error, errore sconosciuto, desc sconosciuta, 500"})
-    @DisplayName("Handle user exception and return ResponseEntity without arguments")
-    void handleUserExceptionTest(String code, String expectedCode, String expectedMessage,
+    @DisplayName("Handle exception and return ResponseEntity without arguments")
+    void handleExceptionTest(String code, String expectedCode, String expectedMessage,
                                  String expectedDescription, int expectedStatus) {
 
         var magiavventureException = MagiavventureException.of(code);
 
-        ResponseEntity<HttpError> responseEntity = defaultExceptionHandler.userExceptionHandler(magiavventureException);
+        ResponseEntity<HttpError> responseEntity = defaultExceptionHandler.exceptionHandler(magiavventureException);
 
         Assertions.assertNotNull(responseEntity);
         Assertions.assertNotNull(responseEntity.getBody());

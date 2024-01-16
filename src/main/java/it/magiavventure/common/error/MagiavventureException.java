@@ -16,12 +16,12 @@ public class MagiavventureException extends RuntimeException {
     }
 
     public static MagiavventureException of(String key, String... args) {
-        final var userError = Error
+        final var error = Error
                 .builder()
                 .key(key)
                 .args(args)
                 .build();
-        return new MagiavventureException(userError);
+        return new MagiavventureException(error);
     }
 
 }
