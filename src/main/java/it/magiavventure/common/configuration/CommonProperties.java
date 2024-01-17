@@ -8,6 +8,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.function.BinaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Data
 @ConfigurationProperties(prefix = "magiavventure.lib.common")
@@ -19,6 +22,7 @@ public class CommonProperties {
     @NoArgsConstructor
     public static class ErrorsProperties {
         private Map<String, ErrorMessage> errorsMessages = Collections.emptyMap();
+        private Map<String, ErrorMessage> serviceErrorsMessages = Collections.emptyMap();
 
         @Data
         @Builder
@@ -29,6 +33,15 @@ public class CommonProperties {
             private String description;
             private String code;
             private int status;
+        }
+
+        private BinaryOperator<ErrorMessage> mergeErrorMessage =
+                (defaultErrorMessage, serviceErrorMessage) -> serviceErrorMessage;
+
+
+        public Map<String, ErrorMessage> retrieveErrorsMessages() {
+            return Stream.concat(errorsMessages.entrySet().stream(), serviceErrorsMessages.entrySet().stream())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, mergeErrorMessage));
         }
     }
 }
