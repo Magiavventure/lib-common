@@ -7,8 +7,6 @@ import lombok.Getter;
 public class MagiavventureException extends RuntimeException {
 
     public static final String UNKNOWN_ERROR = "unknown-error";
-    public static final String JWT_EXPIRED = "jwt-expired";
-    public static final String JWT_NOT_VALID = "jwt-not-valid";
 
     private final transient Error error;
 

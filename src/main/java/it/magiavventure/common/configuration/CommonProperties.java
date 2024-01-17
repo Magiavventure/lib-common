@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,8 +22,10 @@ public class CommonProperties {
     @Data
     @NoArgsConstructor
     public static class ErrorsProperties {
-        private Map<String, ErrorMessage> errorsMessages = Collections.emptyMap();
+        private Map<String, ErrorMessage> defaultErrorsMessages = Collections.emptyMap();
+        private Map<String, ErrorMessage> jwtErrorsMessages = Collections.emptyMap();
         private Map<String, ErrorMessage> serviceErrorsMessages = Collections.emptyMap();
+
 
         @Data
         @Builder
@@ -36,11 +39,13 @@ public class CommonProperties {
         }
 
         private BinaryOperator<ErrorMessage> mergeErrorMessage =
-                (defaultErrorMessage, serviceErrorMessage) -> serviceErrorMessage;
+                (defaultErrorMessage, otherErrorMessage) -> otherErrorMessage;
 
 
         public Map<String, ErrorMessage> retrieveErrorsMessages() {
-            return Stream.concat(errorsMessages.entrySet().stream(), serviceErrorsMessages.entrySet().stream())
+            return Stream.concat(
+                    Stream.concat(defaultErrorsMessages.entrySet().stream(), jwtErrorsMessages.entrySet().stream()),
+                    serviceErrorsMessages.entrySet().stream())
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, mergeErrorMessage));
         }
     }
