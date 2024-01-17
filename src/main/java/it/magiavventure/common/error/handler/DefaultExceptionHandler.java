@@ -37,7 +37,7 @@ public class DefaultExceptionHandler {
     private ErrorMessage retrieveError(@NotNull String key) {
         var errorMessage = commonProperties
                 .getErrors()
-                .getErrorsMessages()
+                .retrieveErrorsMessages()
                 .get(key);
 
         if(Objects.isNull(errorMessage)) return retrieveError(MagiavventureException.UNKNOWN_ERROR);
