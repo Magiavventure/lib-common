@@ -22,7 +22,7 @@ public class CommonProperties {
     @Data
     @NoArgsConstructor
     public static class ErrorsProperties {
-        private Map<String, ErrorMessage> defaultErrorsMessages = Collections.emptyMap();
+        private Map<String, ErrorMessage> errorsMessages = Collections.emptyMap();
         private Map<String, ErrorMessage> jwtErrorsMessages = Collections.emptyMap();
         private Map<String, ErrorMessage> serviceErrorsMessages = Collections.emptyMap();
 
@@ -44,7 +44,7 @@ public class CommonProperties {
 
         public Map<String, ErrorMessage> retrieveErrorsMessages() {
             return Stream.concat(
-                    Stream.concat(defaultErrorsMessages.entrySet().stream(), jwtErrorsMessages.entrySet().stream()),
+                    Stream.concat(errorsMessages.entrySet().stream(), jwtErrorsMessages.entrySet().stream()),
                     serviceErrorsMessages.entrySet().stream())
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, mergeErrorMessage));
         }
