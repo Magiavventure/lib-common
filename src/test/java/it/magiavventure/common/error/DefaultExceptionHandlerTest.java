@@ -103,7 +103,7 @@ class DefaultExceptionHandlerTest {
                 .message("il nome '%s' non è disponibile")
                 .description("desc nome già esistente")
                 .build());
-        errorProperties.setDefaultErrorsMessages(mapErrorMessages);
+        errorProperties.setErrorsMessages(mapErrorMessages);
         commonProperties.setErrors(errorProperties);
         return commonProperties;
     }
