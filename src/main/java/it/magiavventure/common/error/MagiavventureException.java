@@ -7,6 +7,7 @@ import lombok.Getter;
 public class MagiavventureException extends RuntimeException {
 
     public static final String UNKNOWN_ERROR = "unknown-error";
+    public static final String VALIDATION_ERROR = "validation-error";
 
     private final transient Error error;
 

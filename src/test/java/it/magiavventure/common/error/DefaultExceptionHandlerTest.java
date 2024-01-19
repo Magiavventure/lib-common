@@ -45,7 +45,7 @@ class DefaultExceptionHandlerTest {
 
         var magiavventureException = MagiavventureException.of(code, args);
 
-        ResponseEntity<HttpError> responseEntity = defaultExceptionHandler.exceptionHandler(magiavventureException);
+        ResponseEntity<HttpError> responseEntity = defaultExceptionHandler.handleException(magiavventureException);
 
         Assertions.assertNotNull(responseEntity);
         Assertions.assertNotNull(responseEntity.getBody());
@@ -67,7 +67,7 @@ class DefaultExceptionHandlerTest {
 
         var magiavventureException = MagiavventureException.of(code);
 
-        ResponseEntity<HttpError> responseEntity = defaultExceptionHandler.exceptionHandler(magiavventureException);
+        ResponseEntity<HttpError> responseEntity = defaultExceptionHandler.handleException(magiavventureException);
 
         Assertions.assertNotNull(responseEntity);
         Assertions.assertNotNull(responseEntity.getBody());
