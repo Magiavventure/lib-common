@@ -15,12 +15,13 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mapstruct.factory.Mappers;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -87,8 +88,7 @@ class DefaultExceptionHandlerTest {
 
     @Test
     @DisplayName("Handle MethodArgumentValidException and return ResponseEntity with fields in error")
-    void handleMethodArgumentValidException() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest();
+    void handleMethodArgumentValidException() {
         MethodArgumentNotValidException exception = Mockito.mock(MethodArgumentNotValidException.class);
         BindingResult bindingResult = Mockito.mock(BindingResult.class);
         FieldError fieldError = new FieldError("test", "field", "non null");
@@ -97,20 +97,64 @@ class DefaultExceptionHandlerTest {
         Mockito.when(bindingResult.getFieldErrors())
                 .thenReturn(List.of(fieldError));
 
-        ResponseEntity<Object> responseEntity = defaultExceptionHandler.handleException(exception,
-                new ServletWebRequest(request));
+        ResponseEntity<HttpError> responseEntity = defaultExceptionHandler.handleMethodArgumentNotValid(exception);
 
         Mockito.verify(bindingResult).getFieldErrors();
         Mockito.verify(exception).getBindingResult();
 
         Assertions.assertNotNull(responseEntity);
-        HttpError error = (HttpError) responseEntity.getBody();
+        HttpError error = responseEntity.getBody();
         Assertions.assertNotNull(error);
         Assertions.assertEquals("validation-error", error.getCode());
+        Assertions.assertEquals(400, error.getStatus());
         Assertions.assertEquals("Si è verificato un errore", error.getMessage());
         Assertions.assertEquals("Dei campi non sono stati compilati correttamente", error.getDescription());
         Assertions.assertEquals(1, error.getFields().size());
+    }
 
+    @Test
+    @DisplayName("Handle NotFoundException and return ResponseEntity")
+    void handleNotFoundException() {
+        ResponseEntity<HttpError> responseEntity = defaultExceptionHandler
+                .handleNoHandlerException(new NoHandlerFoundException("GET", "/test", HttpHeaders.EMPTY));
+
+        Assertions.assertNotNull(responseEntity);
+        HttpError error = responseEntity.getBody();
+        Assertions.assertNotNull(error);
+        Assertions.assertEquals("not-found", error.getCode());
+        Assertions.assertEquals(404, error.getStatus());
+        Assertions.assertEquals("Si è verificato un errore", error.getMessage());
+        Assertions.assertEquals("La risorsa non è stata trovata", error.getDescription());
+    }
+
+    @Test
+    @DisplayName("Handle generic Exception and return ResponseEntity")
+    void handleGenericException() {
+        ResponseEntity<HttpError> responseEntity = defaultExceptionHandler
+                .handleDefaultException(new Exception("errore nei test"));
+
+        Assertions.assertNotNull(responseEntity);
+        HttpError error = responseEntity.getBody();
+        Assertions.assertNotNull(error);
+        Assertions.assertEquals("service-unavailable", error.getCode());
+        Assertions.assertEquals(503, error.getStatus());
+        Assertions.assertEquals("Si è verificato un errore", error.getMessage());
+        Assertions.assertEquals("Il servizio non è al momento disponibile", error.getDescription());
+    }
+
+    @Test
+    @DisplayName("Handle client Exception and return ResponseEntity")
+    void handleClientException() {
+        ResponseEntity<HttpError> responseEntity = defaultExceptionHandler
+                .handleClientException(new HttpRequestMethodNotSupportedException("errore nei test"));
+
+        Assertions.assertNotNull(responseEntity);
+        HttpError error = responseEntity.getBody();
+        Assertions.assertNotNull(error);
+        Assertions.assertEquals("bad-request", error.getCode());
+        Assertions.assertEquals(400, error.getStatus());
+        Assertions.assertEquals("Si è verificato un errore", error.getMessage());
+        Assertions.assertEquals("È presente un errore nella richiesta", error.getDescription());
     }
 
     private CommonProperties retrieveCommonProperties() {
@@ -144,6 +188,27 @@ class DefaultExceptionHandlerTest {
                 .status(400)
                 .message("Si è verificato un errore")
                 .description("Dei campi non sono stati compilati correttamente")
+                .build());
+        mapErrorMessages.put("not-found", ErrorMessage
+                .builder()
+                .code("not-found")
+                .status(404)
+                .message("Si è verificato un errore")
+                .description("La risorsa non è stata trovata")
+                .build());
+        mapErrorMessages.put("service-unavailable", ErrorMessage
+                .builder()
+                .code("service-unavailable")
+                .status(503)
+                .message("Si è verificato un errore")
+                .description("Il servizio non è al momento disponibile")
+                .build());
+        mapErrorMessages.put("bad-request", ErrorMessage
+                .builder()
+                .code("bad-request")
+                .status(400)
+                .message("Si è verificato un errore")
+                .description("È presente un errore nella richiesta")
                 .build());
         errorProperties.setErrorsMessages(mapErrorMessages);
         commonProperties.setErrors(errorProperties);

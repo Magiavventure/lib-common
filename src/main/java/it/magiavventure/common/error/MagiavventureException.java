@@ -8,6 +8,9 @@ public class MagiavventureException extends RuntimeException {
 
     public static final String UNKNOWN_ERROR = "unknown-error";
     public static final String VALIDATION_ERROR = "validation-error";
+    public static final String BAD_REQUEST = "bad-request";
+    public static final String NOT_FOUND = "not-found";
+    public static final String SERVICE_UNAVAILABLE = "service-unavailable";
 
     private final transient Error error;
 
