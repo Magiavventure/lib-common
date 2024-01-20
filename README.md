@@ -11,7 +11,7 @@ It also inserts the transactionId header to aid log searching.
 The properties exposed to configure this project are:
 
 ```properties
-logging.level.app.magiavventure="string"                                                 # Logging level package magiavventure
+logging.level.it.magiavventure="string"                                                 # Logging level package magiavventure
 magiavventure.lib.common.errors.errors-messages.{error-key}.code="string"                # The exception key error code
 magiavventure.lib.common.errors.errors-messages.{error-key}.message="string"             # The exception key error message
 magiavventure.lib.common.errors.errors-messages.{error-key}.description="string"         # The exception key error description
