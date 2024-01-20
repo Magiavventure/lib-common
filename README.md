@@ -1,4 +1,7 @@
 # Magiavventure - Lib common
+![GitHub Release](https://img.shields.io/github/v/release/Magiavventure/lib-common)
+[![codecov](https://codecov.io/gh/Magiavventure/lib-common/graph/badge.svg?token=S049F9NFTF)](https://codecov.io/gh/Magiavventure/lib-common)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Magiavventure/lib-common/build.yml)
 
 This common library handles errors with a general handler and request and response logs from all services.
 It also inserts the transactionId header to aid log searching.

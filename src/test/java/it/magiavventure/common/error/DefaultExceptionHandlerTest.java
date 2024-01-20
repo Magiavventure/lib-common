@@ -8,6 +8,7 @@ import it.magiavventure.common.mapper.HttpErrorMapper;
 import it.magiavventure.common.model.HttpError;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -15,8 +16,14 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.context.request.ServletWebRequest;
 
 import java.util.HashMap;
+import java.util.List;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -78,6 +85,34 @@ class DefaultExceptionHandlerTest {
         Assertions.assertEquals(expectedStatus, responseEntity.getBody().getStatus());
     }
 
+    @Test
+    @DisplayName("Handle MethodArgumentValidException and return ResponseEntity with fields in error")
+    void handleMethodArgumentValidException() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        MethodArgumentNotValidException exception = Mockito.mock(MethodArgumentNotValidException.class);
+        BindingResult bindingResult = Mockito.mock(BindingResult.class);
+        FieldError fieldError = new FieldError("test", "field", "non null");
+        Mockito.when(exception.getBindingResult())
+                .thenReturn(bindingResult);
+        Mockito.when(bindingResult.getFieldErrors())
+                .thenReturn(List.of(fieldError));
+
+        ResponseEntity<Object> responseEntity = defaultExceptionHandler.handleException(exception,
+                new ServletWebRequest(request));
+
+        Mockito.verify(bindingResult).getFieldErrors();
+        Mockito.verify(exception).getBindingResult();
+
+        Assertions.assertNotNull(responseEntity);
+        HttpError error = (HttpError) responseEntity.getBody();
+        Assertions.assertNotNull(error);
+        Assertions.assertEquals("validation-error", error.getCode());
+        Assertions.assertEquals("Si è verificato un errore", error.getMessage());
+        Assertions.assertEquals("Dei campi non sono stati compilati correttamente", error.getDescription());
+        Assertions.assertEquals(1, error.getFields().size());
+
+    }
+
     private CommonProperties retrieveCommonProperties() {
         var commonProperties = new CommonProperties();
         var errorProperties = new ErrorsProperties();
@@ -102,6 +137,13 @@ class DefaultExceptionHandlerTest {
                 .status(403)
                 .message("il nome '%s' non è disponibile")
                 .description("desc nome già esistente")
+                .build());
+        mapErrorMessages.put("validation-error", ErrorMessage
+                .builder()
+                .code("validation-error")
+                .status(400)
+                .message("Si è verificato un errore")
+                .description("Dei campi non sono stati compilati correttamente")
                 .build());
         errorProperties.setErrorsMessages(mapErrorMessages);
         commonProperties.setErrors(errorProperties);
